@@ -9,30 +9,25 @@ var app = express();
 //route handling
 app.get('/calculus', function (req, res) {
 
-	//handle base64 decoding
-	try {
-		var bytes = base64.decode(req.query.query);
-		var text = utf8.decode(bytes);
-	}catch(e){
-		res.json({"error": true, "message": "BASE64 decoding failed!"});
+	//check for valid input
+	if(!('query' in req.query) || req.query.query === ""){
+		res.json({"error": true, "message": "Missing or empty query parameter!"});
 	}
-	text = text.replace(" ", "");
-	
-	//math expression evaluation. Reverse Polish Notation
-	try {
-		var result = math.eval(text);
-	}catch(e){
-		res.json({"error": true, "message": "Math expression is incorrect!"});	
-	}
+
+	//base64 decode
+	var decoded = handleBase64(req.query.query)
+	if (decoded.error) {res.json(decoded)}
+
+	//math expression evaluation.
+	var result = matheval(decoded.text)
+	if (result.error) {res.json(result)}
 
 	//check for allowed operations
-	var finalResult = checkAllowedOperations(text)
-	if (!finalResult){
-		res.json({"error": true, "message": "Illegal math operation!"});	
-	}
+	var finalResult = checkAllowedOperations(decoded.text)
+	if (!finalResult){res.json({"error": true, "message": "Illegal math operation!"})}
 
 	//everything ok
-  	res.json({"error": false, "result": result});
+  	res.json({"error": false, "result": result.result});
 });
 
 
@@ -48,7 +43,28 @@ function checkAllowedOperations(mathtext){
 	return true
 }
 
-//start http at port 80
+function handleBase64(query){
+	//handle base64 decoding
+	try {
+		var bytes = base64.decode(query);
+		var text = utf8.decode(bytes);
+	}catch(e){
+		return {"error": true, "message": "BASE64 decoding failed!"}
+	}
+	text = text.replace(" ", "");
+	return {"error": false, "text": text}
+}
+
+function matheval(text){
+	try {
+		var result = math.eval(text);
+	}catch(e){
+		return {"error": true, "message": "Math expression is incorrect!"}	
+	}
+	return {"error": false, "result": result}
+}
+
+//start http at port 80 or let Heroku decide
 var server = app.listen(process.env.PORT || 80, function () {
   var host = server.address().address;
   var port = server.address().port;
