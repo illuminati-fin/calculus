@@ -1,5 +1,5 @@
 # Node.js calculator
-The application decode base64 encoded calculation and response with correct answer.
+This application decodes base64 encoded calculation and responses with correct answer.
 
 ### Usage
 1. Initial steps
