@@ -12,9 +12,7 @@ The application decode base64 encoded calculation and response with correct answ
 2. Make an example calculation: i.e. 2 * (23/(3*3))- 23 * (2*3)
 3. Base64 encode: MiAqICgyMy8oMyozKSktIDIzICogKDIqMyk=
 4. On you favorite browser go to:
-
-```http://localhost/calculus?query=MiAqICgyMy8oMyozKSktIDIzICogKDIqMyk=```
-
+http://localhost/calculus?query=MiAqICgyMy8oMyozKSktIDIzICogKDIqMyk=
 5. Result:
 ```
 {
